@@ -22,11 +22,11 @@ const samplePrayerValues = {
   Sunset: "18:35",
 };
 
-const sampleDate = {
-  readable: "16 Apr 2026",
-  hijri: { day: "28", month: { en: "Shawwal", days: 29 } },
-  year: "1227",
-};
+// const sampleDate = {
+//   readable: "16 Apr 2026",
+//   hijri: { day: "28", month: { en: "Shawwal", days: 29 } },
+//   year: "1227",
+// };
 
 async function getLocation() {
   return new Promise((resolve, reject) => {
@@ -43,9 +43,9 @@ async function init() {
     if (!latitude || !longitude) return;
     // console.log(latitude, longitude);
 
-    // const data = await fetch(`/api/prayer?lat=${latitude}&lon=${longitude}`);
-    // const prayerData = await data.json();
-    const prayerData = "Sample Value";
+    const data = await fetch(`/api/prayer?lat=${latitude}&lon=${longitude}`);
+    const prayerData = await data.json();
+    // const prayerData = "Sample Value";
 
     console.log(prayerData);
 
@@ -82,18 +82,18 @@ function updateUI(data, coords) {
 
   const prayerTimes = {};
 
-  // prayerNames.forEach((name) => {
-  //   const time = data.data.times[name];
-  //   renderPrayerTime(name, formatTime(time));
-  //   prayerTimes[name] = time;
-  // });
-
   // renders prayer time boxes to the UI and format the times to 12 hours format
   prayerNames.forEach((name) => {
-    const time = samplePrayerValues[name];
+    const time = data.data.times[name];
     renderPrayerTime(name, formatTime(time));
     prayerTimes[name] = time;
   });
+
+  // prayerNames.forEach((name) => {
+  //   const time = samplePrayerValues[name];
+  //   renderPrayerTime(name, formatTime(time));
+  //   prayerTimes[name] = time;
+  // });
 
   // remove sunrise out of prayerTimes object
   delete prayerTimes.Sunrise;
@@ -102,7 +102,7 @@ function updateUI(data, coords) {
   upcomingPrayerTimer(prayerTimes);
 
   // updates the current date and hijri date
-  updateDate(sampleDate.hijri, sampleDate.readable);
+  updateDate(data.data.date.hijri, data.data.date.readable);
 
   // renders the current location nme
   renderLocationName(coords);

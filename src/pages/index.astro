@@ -1,8 +1,6 @@
 ---
 import "../styles/global.css";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Header from "../layouts/Header.astro";
-const prayerBoxs = [1, 2, 3, 4, 5, 6];
 ---
 
 <BaseLayout>
@@ -11,15 +9,21 @@ const prayerBoxs = [1, 2, 3, 4, 5, 6];
       class="bg-[url(/bg-img-02.jpg)] text-white bg-center bg-cover text-2xl h-screen w-screen flex items-center justify-center"
     >
       <div
-        class="flex flex-col justify-around gap-18 glass-bg rounded-[6vh] p-20"
+        class="flex flex-col justify-around gap-18 glass-bg rounded-[6vh] p-20 w-[70%]"
       >
         <div>
           <p class="font-[\'Monsieur_La_Doulaise\'] mb-12 font-light">
-            Upcoming Prayer <span class="font-bold text-3xl">Fajr</span>
+            Upcoming Prayer <span class="upcoming-prayer font-bold text-3xl"
+              >Fajr</span
+            >
           </p>
-          <div class="flex gap-12">
-            <p class="font-[Victory-Striker] text-9xl">08:11:14</p>
-            <div class="flex flex-col justify-between items-stretch">
+          <div class="grid grid-cols-3 gap-12">
+            <p class="countdown font-[Victory-Striker] text-9xl transition-all">
+              08:23:34
+            </p>
+            <div
+              class="flex flex-col justify-between items-stretch col-span-2 px-4"
+            >
               <div>
                 <p class="en-date font-light">10 April, 2026</p>
                 <p class="hijri-date font-light">22 Shawwal, 1447</p>
@@ -34,12 +38,14 @@ const prayerBoxs = [1, 2, 3, 4, 5, 6];
             <!-- <div class="absolute inset-0 rounded-4xl backdrop-blur-[1px]"></div> -->
           </div>
         </div>
-        <div class="time-box-container flex justify-between gap-8 w-full">
+        <div class="time-box-container flex justify-center gap-8 w-full">
           <template id="time-box">
             <div
-              class="flex flex-col justify-center items-center gap-4 w-40 h-34 glass-item rounded-4xl"
+              class="time-box flex flex-col justify-center items-center gap-4 w-40 h-34 glass-item rounded-4xl"
             >
-              <h2 class="prayer-name text-[20px] font-light">Dhuhr</h2>
+              <h2 class="time-box-txt prayer-name text-[20px] font-light">
+                Dhuhr
+              </h2>
 
               <div class="flex gap-2 justify-between items-start">
                 <p class="prayer-time text-4xl font-[Victory-Striker]">12:26</p>
@@ -57,4 +63,6 @@ const prayerBoxs = [1, 2, 3, 4, 5, 6];
   </main>
 </BaseLayout>
 
-<script src="../scripts/app.js"></script>
+<script>
+  import "../scripts/app.js";
+</script>

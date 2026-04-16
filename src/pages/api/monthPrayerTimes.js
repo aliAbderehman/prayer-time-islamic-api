@@ -18,7 +18,7 @@ export async function GET({ url }) {
   const apiKey = import.meta.env.API_KEY;
 
   const res = await fetch(
-    `https://islamicapi.com/api/v1/prayer-time/?lat=${lat}&lon=${lon}&method=${method}&school=${school}&api_key=${apiKey}`,
+    `https://islamicapi.com/api/v1/prayer-time/?lat=${lat}&lon=${lon}&date=2026-03&api_key=${apiKey}`,
   );
 
   const data = await res.json();

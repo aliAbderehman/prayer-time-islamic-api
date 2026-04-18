@@ -18,3 +18,7 @@
 .glass-item {
   @apply bg-white/20 backdrop-blur-lg border border-white/30 shadow-xl;
 }
+
+.selected {
+  @apply border  border-cyan-300 scale-105;
+}

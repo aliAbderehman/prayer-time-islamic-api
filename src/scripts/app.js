@@ -1,6 +1,6 @@
 import { getPrayerTime } from "./prayerTime";
 
-const template = document.getElementById("time-box");
+const template = document.getElementById("times-box");
 const timeContainer = document.querySelector(".time-box-container");
 const hijriDate = document.querySelector(".hijri-date");
 const enDate = document.querySelector(".en-date");
@@ -8,8 +8,10 @@ const locationName = document.querySelector(".location-name");
 const countdown = document.querySelector(".countdown");
 const upcomingPrayerTxt = document.querySelector(".upcoming-prayer");
 
+let currentPrayer;
+
 const samplePrayerValues = {
-  Asr: "15:30",
+  Asr: "13:46",
   Dhuhr: "12:25",
   Fajr: "05:04",
   Firstthird: "22:28",
@@ -22,30 +24,63 @@ const samplePrayerValues = {
   Sunset: "18:35",
 };
 
-// const sampleDate = {
-//   readable: "16 Apr 2026",
-//   hijri: { day: "28", month: { en: "Shawwal", days: 29 } },
-//   year: "1227",
-// };
+const sampleDate = {
+  readable: "16 Apr 2026",
+  hijri: { day: "28", month: { en: "Shawwal", days: 29 }, year: "1447" },
+};
 
-async function getLocation() {
-  return new Promise((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition(resolve, reject);
+// async function getLocation() {
+//   alert("hey, we're inside getLocation");
+
+//   return new Promise((resolve, reject) => {
+//     navigator.geolocation.getCurrentPosition(resolve, reject);
+//   });
+// }
+
+function getLocation() {
+  return new Promise((resolve) => {
+    let done = false;
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        done = true;
+        resolve(pos);
+      },
+      (err) => {
+        done = true;
+        resolve(null);
+      },
+    );
+
+    setTimeout(() => {
+      if (!done) {
+        resolve(null);
+      }
+    }, 5000);
   });
 }
 
 async function init() {
+  let coords = { latitude: 51.509865, longitude: -0.118092 };
   try {
     const position = await getLocation();
 
-    const { latitude, longitude } = position.coords;
+    if (position?.coords) {
+      coords = position.coords;
+      // alert("howdy, the cords has been found");
+    } else {
+      // alert("yeesh, I got a bad news");
+      // alert(`${coords.latitude}`);
+    }
+
+    const { latitude, longitude } = coords;
 
     if (!latitude || !longitude) return;
     // console.log(latitude, longitude);
 
-    const data = await fetch(`/api/prayer?lat=${latitude}&lon=${longitude}`);
-    const prayerData = await data.json();
-    // const prayerData = "Sample Value";
+    // const data = await fetch(`/api/prayer?lat=${latitude}&lon=${longitude}`);
+    // const prayerData = await data.json();
+    const prayerData = "Sample Value";
 
     console.log(prayerData);
 
@@ -78,45 +113,92 @@ function formatTime(time24) {
 }
 
 function updateUI(data, coords) {
+  // renders prayer time boxes to the UI and format the times to 12 hours format
+  // prayerNames.forEach((name) => {
+  //   const time = data.data.times[name];
+  //   renderPrayerTime(name, formatTime(time));
+  //   prayerTimes[name] = time;
+  // });
   const prayerNames = ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
   const prayerTimes = {};
 
-  // renders prayer time boxes to the UI and format the times to 12 hours format
   prayerNames.forEach((name) => {
-    const time = data.data.times[name];
-    renderPrayerTime(name, formatTime(time));
+    const time = samplePrayerValues[name];
     prayerTimes[name] = time;
   });
-
-  // prayerNames.forEach((name) => {
-  //   const time = samplePrayerValues[name];
-  //   renderPrayerTime(name, formatTime(time));
-  //   prayerTimes[name] = time;
-  // });
-
-  // remove sunrise out of prayerTimes object
-  delete prayerTimes.Sunrise;
 
   // handle the next prayer and ther remaining time untill the next prayer
   upcomingPrayerTimer(prayerTimes);
 
   // updates the current date and hijri date
-  updateDate(data.data.date.hijri, data.data.date.readable);
+  updateDate(sampleDate.hijri, sampleDate.readable);
+  // updateDate(data.data.date.hijri, data.data.date.readable);
 
   // renders the current location nme
   renderLocationName(coords);
 }
 
-function renderPrayerTime(name, time) {
-  const clone = template.content.cloneNode(true);
+function renderPrayerTime(data) {
+  // console.log("upcomingPrayer", currentPrayer);
 
-  clone.querySelector(".prayer-name").textContent = name;
-  clone.querySelector(".prayer-time").textContent = time.time;
-  clone.querySelector(".prayer-span").textContent = time.period;
+  const prayerNames = ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
-  timeContainer.appendChild(clone);
+  console.log(data);
+
+  // TODO: sort the prayer boxes based on the rotatePrayer so the next prayer appears first
+  setInterval(() => {
+    const now = new Date();
+    const formattedPrayerTimes = fixPrayerTimes(data, now);
+    const nextPrayer = getNextPrayer(formattedPrayerTimes);
+
+    // console.log(nextPrayer.name);
+
+    const rotatedPrayers = rotatePrayer(formattedPrayerTimes, nextPrayer);
+
+    const sortedPrayers = rotatedPrayers.map((prayer) => prayer.name);
+
+    // console.log(sortedPrayers);
+
+    timeContainer.innerHTML = "";
+
+    sortedPrayers.forEach((name) => {
+      const clone = template.content.cloneNode(true);
+
+      const time = data[name];
+
+      clone.querySelector(".prayer-name").textContent = name;
+      clone.querySelector(".prayer-time").textContent = formatTime(time).time;
+      clone.querySelector(".prayer-span").textContent = formatTime(time).period;
+
+      timeContainer.appendChild(clone);
+    });
+
+    const nextPrayerEl = document.querySelectorAll(".time-box");
+
+    nextPrayerEl[0].classList.add("selected");
+
+    console.log(nextPrayerEl[0]);
+  }, 1000);
 }
+
+function rotatePrayer(prayers, startValue) {
+  const index = prayers.indexOf(startValue);
+
+  if (index === -1) return prayers; // value not found, just return original
+
+  return [...prayers.slice(index), ...prayers.slice(0, index)];
+}
+
+// function renderPrayerTime(name, time) {
+//   const clone = template.content.cloneNode(true);
+
+//   clone.querySelector(".prayer-name").textContent = name;
+//   clone.querySelector(".prayer-time").textContent = time.time;
+//   clone.querySelector(".prayer-span").textContent = time.period;
+
+//   timeContainer.appendChild(clone);
+// }
 
 // TODO: handle count down upcoming prayer
 
@@ -142,11 +224,37 @@ function fixPrayerTimes(prayerTime, now) {
 function handleCoutdown() {}
 
 function upcomingPrayerTimer(prayerTime) {
-  const now = new Date();
+  renderPrayerTime(prayerTime);
 
-  // fixed the prayer names and times with keys  ex. {name: 'Fajr', time: '05:05'}
-  const formattedPrayerTimes = fixPrayerTimes(prayerTime, now);
+  delete prayerTime.Sunrise;
 
+  // TODO: handle what happens when the timer reached 0
+  setInterval(() => {
+    const now = new Date();
+
+    // fixed the prayer names and times with keys  ex. {name: 'Fajr', time: '05:05'}
+    const formattedPrayerTimes = fixPrayerTimes(prayerTime, now);
+
+    const nextPrayer = getNextPrayer(formattedPrayerTimes);
+
+    const targetTime = nextPrayer.time;
+
+    // const timeBoxTxt = document.querySelector(".time-box-txt");
+    // const now = new Date();
+    let totalSeconds = Math.floor((targetTime - now) / 1000);
+
+    // handles what happens when the counter reached 0
+    if (totalSeconds <= 0) {
+      countdown.textContent = "00:00:00";
+      return;
+    }
+
+    // updates upcoming prayer Name and the remaining time
+    updateUpcomingPrayer(totalSeconds, nextPrayer.name);
+  }, 1000);
+}
+
+function getNextPrayer(formattedPrayerTimes) {
   let nextPrayer = formattedPrayerTimes.find(
     (prayer) => new Date() < prayer.time,
   );
@@ -155,42 +263,27 @@ function upcomingPrayerTimer(prayerTime) {
 
   formattedPrayerTimes[0].time = new Date(aDay);
 
-  console.log(formattedPrayerTimes[0].time);
-
   if (!nextPrayer) nextPrayer = formattedPrayerTimes[0];
-  // TODO: hadle undefined
 
-  console.log("check: ", nextPrayer);
+  return nextPrayer;
+}
 
-  const targetTime = nextPrayer.time;
+function updateUpcomingPrayer(totalSeconds, nextPrayerName) {
+  const difHour = Math.floor(totalSeconds / 3600);
+  const difMin = Math.floor((totalSeconds % 3600) / 60);
+  const difSec = totalSeconds % 60;
 
-  const timeBoxTxt = document.querySelector(".time-box-txt");
+  const formattedTime =
+    String(difHour).padStart(2, "0") +
+    ":" +
+    String(difMin).padStart(2, "0") +
+    ":" +
+    String(difSec).padStart(2, "0");
 
-  // TODO: handle what happens when the timer reached 0
-  setInterval(() => {
-    const now = new Date();
-    let totalSeconds = Math.floor((targetTime - now) / 1000);
+  countdown.textContent = formattedTime;
+  upcomingPrayerTxt.textContent = nextPrayerName;
 
-    if (totalSeconds <= 0) {
-      countdown.textContent = "00:00:00";
-      return;
-    }
-
-    const difHour = Math.floor(totalSeconds / 3600);
-    const difMin = Math.floor((totalSeconds % 3600) / 60);
-    const difSec = totalSeconds % 60;
-
-    const formattedTime =
-      String(difHour).padStart(2, "0") +
-      ":" +
-      String(difMin).padStart(2, "0") +
-      ":" +
-      String(difSec).padStart(2, "0");
-
-    countdown.textContent = formattedTime;
-  }, 1000);
-
-  upcomingPrayerTxt.textContent = nextPrayer.name;
+  // currentPrayer = nextPrayer;
 }
 
 function updateDate(hijri, date) {
@@ -221,59 +314,3 @@ async function renderLocationName(coords) {
 }
 
 init();
-
-// const now = new Date();
-// const year = now.getFullYear();
-// const month = now.getMonth() + 1;
-// const date = now.getDate();
-// const hoursNow = now.getHours();
-// const minutesNow = now.getMinutes();
-
-// console.log("DATE:", new Date(Date.now()).getMonth());
-
-// const nextPrayer = Object.entries(prayerTime).map((time) => {
-//   return time;
-// });
-
-// console.log(nextPrayer);
-
-// const todayPrayers = nextPrayer.map((prayer) => ({
-//   name: [prayer[0]],
-//   time: new Date(`${year}, ${month}, ${date}, ${prayer[1]}`),
-// }));
-
-// console.log(todayPrayers);
-
-// const upcomingPrayer = todayPrayers.find(
-//   (prayer) => new Date(Object.values(prayer)) > new Date(),
-// );
-
-// console.log(upcomingPrayer);
-// upcomingPrayerTxt.textContent = upcomingPrayer.name;
-
-// let countdownTime = upcomingPrayer.time - new Date();
-
-// console.log(new Date(countdownTime));
-
-// // setInterval(() => {
-// //   upcomingPrayer -= 1000;
-// //   console.log(new Date(upcomingPrayer));
-// // }, 1000);
-
-// // console.log(upcomingPrayer);
-
-// 0
-// :
-// {name: 'Fajr', time: Wed Apr 15 2026 05:05:00 GMT+0300 (East Africa Time)}
-// 1
-// :
-// {name: 'Dhuhr', time: Wed Apr 15 2026 12:25:00 GMT+0300 (East Africa Time)}
-// 2
-// :
-// {name: 'Asr', time: Wed Apr 15 2026 15:30:00 GMT+0300 (East Africa Time)}
-// 3
-// :
-// {name: 'Maghrib', time: Wed Apr 15 2026 18:35:00 GMT+0300 (East Africa Time)}
-// 4
-// :
-// {name: 'Isha', time: Wed Apr 15 2026 19:42:00 GMT+0300 (East Africa Time)}

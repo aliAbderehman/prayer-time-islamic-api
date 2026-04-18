@@ -6,51 +6,66 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 <BaseLayout>
   <main class="">
     <section
-      class="bg-[url(/bg-img-02.jpg)] text-white bg-center bg-cover text-2xl h-screen w-screen flex items-center justify-center"
+      class="bg-[url(/bg-img-02.jpg)] text-white bg-center bg-cover text-base min-h-screen w-screen flex items-center justify-center"
     >
       <div
-        class="flex flex-col justify-around gap-18 glass-bg rounded-[6vh] p-20 w-[70%]"
+        class="flex flex-col gap-6 glass-bg rounded-[4vh] p-4 pt-6 mt-24 w-[90%]"
       >
-        <div>
-          <p class="font-[\'Monsieur_La_Doulaise\'] mb-12 font-light">
-            Upcoming Prayer <span class="upcoming-prayer font-bold text-3xl"
-              >Fajr</span
+        <div class="grid grid-cols-2 gap-4">
+          <p
+            class="font-[\'Monsieur_La_Doulaise\'] font-light text-base md:text-xl col-span-2"
+          >
+            Upcoming Prayer <span class="upcoming-prayer font-bold">Fajr</span>
+          </p>
+
+          <p
+            class="countdown font-[Victory-Striker] md:self-center text-4xl md:text-8xl transition-all md:row-span-2"
+          >
+            08:23:34
+          </p>
+          <div class="flex flex-col">
+            <p
+              class="en-date font-light text-base md:text-xl self-end md:self-start"
+            >
+              10 April, 2026
+            </p>
+            <p
+              class="hijri-date font-light text-base md:text-xl self-end md:self-start"
+            >
+              22 Shawwal, 1447
+            </p>
+          </div>
+
+          <p
+            class="text-xl md:text-4xl font-light col-span-2 md:col-span-1 md:col-start-2"
+          >
+            Prayer Times in <span class="location-name font-bold"
+              >Addis Ababa</span
             >
           </p>
-          <div class="grid grid-cols-3 gap-12">
-            <p class="countdown font-[Victory-Striker] text-9xl transition-all">
-              08:23:34
-            </p>
-            <div
-              class="flex flex-col justify-between items-stretch col-span-2 px-4"
-            >
-              <div>
-                <p class="en-date font-light">10 April, 2026</p>
-                <p class="hijri-date font-light">22 Shawwal, 1447</p>
-              </div>
-              <p class="text-4xl font-light">
-                Prayer Times in <span class="location-name font-bold"
-                  >Addis Ababa</span
-                >
-              </p>
-            </div>
-
-            <!-- <div class="absolute inset-0 rounded-4xl backdrop-blur-[1px]"></div> -->
-          </div>
         </div>
-        <div class="time-box-container flex justify-center gap-8 w-full">
-          <template id="time-box">
+
+        <div
+          class="time-box-container md:mt-12 md:flex-row md:justify-between px-4 flex flex-col justify-center gap-4 w-full"
+        >
+          <template id="times-box">
             <div
-              class="time-box flex flex-col justify-center items-center gap-4 w-40 h-34 glass-item rounded-4xl"
+              class="flex md:flex-col time-box md:max-w-40 justify-between md:justify-center items-center gap-4 w-full py-3 px-6 glass-item rounded-3xl md:rounded-4xl"
             >
-              <h2 class="time-box-txt prayer-name text-[20px] font-light">
+              <h2
+                class="time-box-txt prayer-name text-base md:text-xl font-light"
+              >
                 Dhuhr
               </h2>
 
               <div class="flex gap-2 justify-between items-start">
-                <p class="prayer-time text-4xl font-[Victory-Striker]">12:26</p>
+                <p
+                  class="prayer-time text-2xl md:text-4xl font-[Victory-Striker]"
+                >
+                  12:26
+                </p>
                 <span
-                  class="prayer-span text-[20px] align-top font-[Montserrat] font-light"
+                  class="prayer-span text-sm md:text-base align-top font-[Montserrat] font-light"
                 >
                   AM
                 </span>
@@ -63,6 +78,4 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   </main>
 </BaseLayout>
 
-<script>
-  import "../scripts/app.js";
-</script>
+<script type="module" src="/src/scripts/app.js"></script>

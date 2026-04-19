@@ -1,16 +1,30 @@
 ---
 import "../styles/global.css";
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+const response = `https://source.unsplash.com/random/1920x1080?landscape`;
+
+// const samp = await response.json();
+
+const imgs = ["nature", "mountain", "city", "forest"];
+const seed = imgs[Math.floor(Math.random() * imgs.length)];
+// const seed = Math.floor(Math.random() * 1);
+
+const imageUrl = `https://picsum.photos/seed/${seed}/1920/1920`;
+console.log(seed);
 ---
 
 <BaseLayout>
   <main class="">
     <section
-      class="bg-[url(/bg-img-02.jpg)] text-white bg-center bg-cover text-base min-h-screen w-screen flex items-center justify-center"
+      style={`background-image: url('${imageUrl}')`}
+      class={`bg-[url(${imageUrl})] text-white bg-center bg-cover text-base min-h-svh w-screen flex items-center justify-center`}
     >
+      <div class="w-full h-full absolute bg-black/30"></div>
       <div
-        class="flex flex-col gap-6 glass-bg rounded-[4vh] p-4 pt-6 mt-24 w-[90%]"
+        class="flex flex-col gap-6 glass-bg rounded-[4vh] p-4 pt-4 lg:p-20 xl:max-w-6xl md:w-[90%] xl:w-[75%]"
       >
+        <!-- <img src={response.url} alt="" /> -->
         <div class="grid grid-cols-2 gap-4">
           <p
             class="font-[\'Monsieur_La_Doulaise\'] font-light text-base md:text-xl col-span-2"
@@ -46,11 +60,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         </div>
 
         <div
-          class="time-box-container md:mt-12 md:flex-row md:justify-between px-4 flex flex-col justify-center gap-4 w-full"
+          class="time-box-container md:mt-12 lg:flex-row md:justify-between md:px-12 lg:px-0 px-4 flex flex-col justify-center gap-3 w-full"
         >
           <template id="times-box">
             <div
-              class="flex md:flex-col time-box md:max-w-40 justify-between md:justify-center items-center gap-4 w-full py-3 px-6 glass-item rounded-3xl md:rounded-4xl"
+              class="flex lg:flex-col time-box lg:max-w-40 justify-between lg:justify-center items-center gap-2 w-full py-2 md:py-4 px-6 glass-item rounded-2xl md:rounded-4xl hover:-translate-2 transition-all"
             >
               <h2
                 class="time-box-txt prayer-name text-base md:text-xl font-light"
@@ -60,7 +74,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
               <div class="flex gap-2 justify-between items-start">
                 <p
-                  class="prayer-time text-2xl md:text-4xl font-[Victory-Striker]"
+                  class="prayer-time text-xl md:text-4xl font-[Victory-Striker]"
                 >
                   12:26
                 </p>

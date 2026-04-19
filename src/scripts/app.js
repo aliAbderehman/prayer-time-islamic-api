@@ -61,7 +61,7 @@ function getLocation() {
 }
 
 async function init() {
-  let coords = { latitude: 51.509865, longitude: -0.118092 };
+  let coords = { latitude: 9.123903, longitude: 38.72245 };
   try {
     const position = await getLocation();
 
@@ -293,6 +293,7 @@ function updateDate(hijri, date) {
 }
 
 async function renderLocationName(coords) {
+  console.log(coords);
   const location = await fetch(
     `https://nominatim.openstreetmap.org/reverse?lat=${coords.latitude}&lon=${coords.longitude}&format=json`,
   );

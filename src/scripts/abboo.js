@@ -8,8 +8,6 @@ const locationName = document.querySelector(".location-name");
 const countdown = document.querySelector(".countdown");
 const upcomingPrayerTxt = document.querySelector(".upcoming-prayer");
 
-let currentPrayer;
-
 const samplePrayerValues = {
   Asr: "13:46",
   Dhuhr: "12:25",
@@ -222,37 +220,6 @@ function fixPrayerTimes(prayerTime, now) {
 }
 
 function handleCoutdown() {}
-
-function upcomingPrayerTimer(prayerTime) {
-  renderPrayerTime(prayerTime);
-
-  delete prayerTime.Sunrise;
-
-  // TODO: handle what happens when the timer reached 0
-  setInterval(() => {
-    const now = new Date();
-
-    // fixed the prayer names and times with keys  ex. {name: 'Fajr', time: '05:05'}
-    const formattedPrayerTimes = fixPrayerTimes(prayerTime, now);
-
-    const nextPrayer = getNextPrayer(formattedPrayerTimes);
-
-    const targetTime = nextPrayer.time;
-
-    // const timeBoxTxt = document.querySelector(".time-box-txt");
-    // const now = new Date();
-    let totalSeconds = Math.floor((targetTime - now) / 1000);
-
-    // handles what happens when the counter reached 0
-    if (totalSeconds <= 0) {
-      countdown.textContent = "00:00:00";
-      return;
-    }
-
-    // updates upcoming prayer Name and the remaining time
-    updateUpcomingPrayer(totalSeconds, nextPrayer.name);
-  }, 1000);
-}
 
 function getNextPrayer(formattedPrayerTimes) {
   let nextPrayer = formattedPrayerTimes.find(

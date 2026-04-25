@@ -20,5 +20,5 @@
 }
 
 .selected {
-  @apply border  border-cyan-300 scale-105;
+  @apply border  scale-105 bg-white/40;
 }
